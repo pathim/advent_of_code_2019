@@ -2,36 +2,38 @@ use std::convert::TryFrom;
 use std::io::BufRead;
 
 pub type Int = i64;
-pub trait InOut{
-	fn input(&mut self) ->Option<Int>;
-	fn output(&mut self, value:Int);
+pub trait InOut {
+	fn input(&mut self) -> Option<Int>;
+	fn output(&mut self, value: Int);
 }
-pub struct SimpleInOut{
-	in_value:Int,
-	pub out_values:Vec<Int>,
+pub struct SimpleInOut {
+	in_value: Int,
+	pub out_values: Vec<Int>,
 }
-impl SimpleInOut{
-	pub fn new(in_value:Int) -> Self{
-		Self{in_value,out_values:Vec::new()}
+impl SimpleInOut {
+	pub fn new(in_value: Int) -> Self {
+		Self {
+			in_value,
+			out_values: Vec::new(),
+		}
 	}
 }
-impl InOut for SimpleInOut{
-    fn input(&mut self) ->Option<Int> {
-        Some(self.in_value)
-    }
+impl InOut for SimpleInOut {
+	fn input(&mut self) -> Option<Int> {
+		Some(self.in_value)
+	}
 
-    fn output(&mut self, value:Int) {
-        self.out_values.push(value)
-    }
+	fn output(&mut self, value: Int) {
+		self.out_values.push(value)
+	}
 }
 pub struct DummyInOut;
-impl InOut for DummyInOut{
-    fn input(&mut self) ->Option<Int> {
-        None
-    }
+impl InOut for DummyInOut {
+	fn input(&mut self) -> Option<Int> {
+		None
+	}
 
-    fn output(&mut self, _value:Int) {
-    }
+	fn output(&mut self, _value: Int) {}
 }
 #[derive(Debug)]
 pub enum Error {
@@ -128,24 +130,37 @@ impl Machine {
 	pub fn get_mem(&self, addr: usize) -> Int {
 		self.mem[addr]
 	}
-	pub fn run<T: InOut>(&mut self,mut inout:T) -> Result<T, Error> {
-		self.running = true;
-		while self.running {
+	pub fn run<T: IntoIterator<Item = Int>>(
+		&mut self,
+		input: T,
+	) -> Result<(bool, Vec<Int>), Error> {
+		let mut output = Vec::new();
+		let mut input_iter = input.into_iter();
+		loop {
 			let op = Opcode::try_from(self.read_ip_and_advance())?;
 			match op {
 				Opcode::Add(p1, p2, p3) => self.bin_op(|a, b| a + b, p1, p2, p3)?,
 				Opcode::Mul(p1, p2, p3) => self.bin_op(|a, b| a * b, p1, p2, p3)?,
-				Opcode::Input(p1) => self.input(p1, &mut inout)?,
-				Opcode::Output(p1) => inout.output(self.output(p1)),
+				Opcode::Input(p1) => {
+					if let Some(val) = input_iter.next() {
+						self.input(p1, val)?
+					} else {
+						self.ip -= 1;
+						return Ok((false, output));
+					}
+				}
+				Opcode::Output(p1) => output.push(self.output(p1)),
 				Opcode::Jit(p1, p2) => self.jump_condition(|x| x != 0, p1, p2),
 				Opcode::Jif(p1, p2) => self.jump_condition(|x| x == 0, p1, p2),
 				Opcode::Lt(p1, p2, p3) => self.bin_op(|a, b| (a < b) as Int, p1, p2, p3)?,
 				Opcode::Eq(p1, p2, p3) => self.bin_op(|a, b| (a == b) as Int, p1, p2, p3)?,
 				Opcode::Arb(p1) => self.adjust_relative_base(p1),
-				Opcode::Halt => self.running = false,
+				Opcode::Halt => {
+					self.ip -= 1;
+					return Ok((true, output));
+				}
 			};
 		}
-		Ok(inout)
 	}
 
 	fn read_ip_and_advance(&mut self) -> Int {
@@ -174,8 +189,7 @@ impl Machine {
 		Ok(())
 	}
 
-	fn input(&mut self, pm: ParamMode, input:&mut impl InOut) -> Result<(), Error> {
-		let value = input.input().ok_or(Error::NotEnoughInput)?;
+	fn input(&mut self, pm: ParamMode, value: Int) -> Result<(), Error> {
 		let dest = self.read_ip_and_advance();
 		self.set_param_value(value, pm, dest)?;
 		Ok(())
