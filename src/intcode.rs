@@ -2,44 +2,11 @@ use std::convert::TryFrom;
 use std::io::BufRead;
 
 pub type Int = i64;
-pub trait InOut {
-	fn input(&mut self) -> Option<Int>;
-	fn output(&mut self, value: Int);
-}
-pub struct SimpleInOut {
-	in_value: Int,
-	pub out_values: Vec<Int>,
-}
-impl SimpleInOut {
-	pub fn new(in_value: Int) -> Self {
-		Self {
-			in_value,
-			out_values: Vec::new(),
-		}
-	}
-}
-impl InOut for SimpleInOut {
-	fn input(&mut self) -> Option<Int> {
-		Some(self.in_value)
-	}
 
-	fn output(&mut self, value: Int) {
-		self.out_values.push(value)
-	}
-}
-pub struct DummyInOut;
-impl InOut for DummyInOut {
-	fn input(&mut self) -> Option<Int> {
-		None
-	}
-
-	fn output(&mut self, _value: Int) {}
-}
 #[derive(Debug)]
 pub enum Error {
 	IllegalOp(Int),
 	IllegalParamMode(Int),
-	NotEnoughInput,
 	TriedToWriteImmediate,
 }
 #[derive(Debug)]
