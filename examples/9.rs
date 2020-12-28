@@ -1,4 +1,5 @@
 use aoc2019::get_input;
+use aoc2019::intcode::SimpleInOut;
 
 fn main() -> std::io::Result<()> {
 	println!("Day 9");
@@ -7,16 +8,16 @@ fn main() -> std::io::Result<()> {
 
 	let mut machine = base_machine.clone();
 	let first = *machine
-		.run(Some(1))
-		.expect("Error during execution")
+		.run(SimpleInOut::new(1))
+		.expect("Error during execution").out_values
 		.last()
 		.expect("No output");
 	println!("First solution: {}", first);
 
 	let mut machine = base_machine.clone();
 	let second = *machine
-		.run(Some(2))
-		.expect("Error during execution")
+		.run(SimpleInOut::new(2))
+		.expect("Error during execution").out_values
 		.last()
 		.expect("No output");
 	println!("Second solution: {}", second);

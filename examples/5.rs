@@ -6,18 +6,18 @@ fn main() -> std::io::Result<()> {
 	let base_machine = aoc2019::intcode::Machine::from_file(input);
 
 	let mut machine = base_machine.clone();
-	let first = *machine
-		.run(Some(1))
-		.expect("Error during execution")
-		.last()
+	let inout=aoc2019::intcode::SimpleInOut::new(1);
+	let first=*machine
+		.run(inout)
+		.expect("Error during execution").out_values.last()
 		.expect("No output");
 	println!("First solution: {}", first);
 
 	let mut machine = base_machine.clone();
-	let second = *machine
-		.run(Some(5))
-		.expect("Error during execution")
-		.last()
+	let inout=aoc2019::intcode::SimpleInOut::new(5);
+	let second=*machine
+		.run(inout)
+		.expect("Error during execution").out_values.last()
 		.expect("No output");
 	println!("Second solution: {}", second);
 	Ok(())
