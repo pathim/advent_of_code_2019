@@ -7,6 +7,24 @@ fn is_beam(mut m: Machine, x: Int, y: Int) -> bool {
 	*res.first().expect("No output") == 1
 }
 
+fn find_edge(m:&Machine,y:Int, xstart:Int) -> (Int,Int){
+	let mut x0=0;
+	for x in xstart..{
+		if is_beam(m.clone(), x, y){
+			x0=x;
+			break;
+		}
+	};
+	let mut x1=x0;
+	for x in x0+1..{
+		if !is_beam(m.clone(), x, y){
+			x1=x;
+			break;
+		}
+	}
+	(x0,x1)
+}
+
 fn main() -> std::io::Result<()> {
 	let day = 19;
 	let input = get_input(day)?;
@@ -19,6 +37,23 @@ fn main() -> std::io::Result<()> {
 		}
 	}
 	println!("First solution {}", first);
+
+	let mut xstart=0;
+	let mut second=0;
+	for y in 1500..{
+		let (x0,x1)=find_edge(&bm, y, xstart);
+		xstart=x0;
+		if x1-x0<100{
+			continue;
+		}
+		let (x0_1,_)=find_edge(&bm, y+99, x0);
+		println!("{}",x1-x0_1);
+		if x1-x0_1==100{
+			second=x0_1*10000+y;
+			break;
+		}
+	}
+	println!("Second solution {}",second);
 
 	Ok(())
 }
