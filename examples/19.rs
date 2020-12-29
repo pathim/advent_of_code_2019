@@ -58,6 +58,15 @@ fn main() -> std::io::Result<()> {
 		}
 	}
 	println!("Second solution {}", second);
+	/*
+	Idea for faster solution:
+	 - The edges of the beam are linear
+	 - Sample some lines to find the edges
+	 - do linear fit to find y_0(x)=a*x and y_1(x)=b*x
+	 - solve y_0(x)-100=y_1(x+100)=> a*x-100=b*x+100*b => x=(100*b+100)/(a-b)
+	 - solution 10000*x+y_0(x)-100 => (10000+a)*x-100
+	 (All formulas modulo off-by-one-errors)
+	 */
 
 	Ok(())
 }
