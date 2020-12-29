@@ -1,3 +1,5 @@
+use std::cmp::max;
+
 use aoc2019::get_input;
 use aoc2019::intcode::{Int, Machine};
 
@@ -7,22 +9,22 @@ fn is_beam(mut m: Machine, x: Int, y: Int) -> bool {
 	*res.first().expect("No output") == 1
 }
 
-fn find_edge(m:&Machine,y:Int, xstart:Int) -> (Int,Int){
-	let mut x0=0;
-	for x in xstart..{
-		if is_beam(m.clone(), x, y){
-			x0=x;
-			break;
-		}
-	};
-	let mut x1=x0;
-	for x in x0+1..{
-		if !is_beam(m.clone(), x, y){
-			x1=x;
+fn find_edge(m: &Machine, y: Int, xstart: Int, xend: Int) -> (Int, Int) {
+	let mut x0 = 0;
+	for x in xstart.. {
+		if is_beam(m.clone(), x, y) {
+			x0 = x;
 			break;
 		}
 	}
-	(x0,x1)
+	let mut x1 = 0;
+	for x in max(x0, xend).. {
+		if !is_beam(m.clone(), x, y) {
+			x1 = x;
+			break;
+		}
+	}
+	(x0, x1)
 }
 
 fn main() -> std::io::Result<()> {
@@ -38,22 +40,24 @@ fn main() -> std::io::Result<()> {
 	}
 	println!("First solution {}", first);
 
-	let mut xstart=0;
-	let mut second=0;
-	for y in 1500..{
-		let (x0,x1)=find_edge(&bm, y, xstart);
-		xstart=x0;
-		if x1-x0<100{
+	let mut xstart = 0;
+	let mut xend = 0;
+	let mut second = 0;
+	for y in 10.. {
+		// skip beginning. algorithm does not work with lines without beam
+		let (x0, x1) = find_edge(&bm, y, xstart, xend);
+		xstart = x0;
+		xend = x1;
+		if xend - xstart < 100 {
 			continue;
 		}
-		let (x0_1,_)=find_edge(&bm, y+99, x0);
-		println!("{}",x1-x0_1);
-		if x1-x0_1==100{
-			second=x0_1*10000+y;
+		let (x0_1, _) = find_edge(&bm, y + 99, xstart, xend);
+		if xend - x0_1 == 100 {
+			second = x0_1 * 10000 + y;
 			break;
 		}
 	}
-	println!("Second solution {}",second);
+	println!("Second solution {}", second);
 
 	Ok(())
 }
