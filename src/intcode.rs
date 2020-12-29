@@ -5,9 +5,19 @@ pub type Int = i64;
 
 #[derive(Debug)]
 pub enum Error {
-	IllegalOp(Int),
-	IllegalParamMode(Int),
+	IllegalOp(Int, Option<usize>),
+	IllegalParamMode(Int, Option<usize>),
 	TriedToWriteImmediate,
+}
+
+impl Error {
+	pub fn add_loc(self, loc: usize) -> Self {
+		match self {
+			Error::IllegalOp(v, _) => Error::IllegalOp(v, Some(loc)),
+			Error::IllegalParamMode(v, _) => Error::IllegalParamMode(v, Some(loc)),
+			_ => self,
+		}
+	}
 }
 #[derive(Debug)]
 enum ParamMode {
@@ -24,7 +34,7 @@ impl TryFrom<Int> for ParamMode {
 			0 => Ok(ParamMode::Pos),
 			1 => Ok(ParamMode::Imm),
 			2 => Ok(ParamMode::Rel),
-			_ => Err(Error::IllegalParamMode(value)),
+			_ => Err(Error::IllegalParamMode(value, None)),
 		}
 	}
 }
@@ -60,7 +70,7 @@ impl TryFrom<Int> for Opcode {
 			8 => Ok(Opcode::Eq(p1, p2, p3)),
 			9 => Ok(Opcode::Arb(p1)),
 			99 => Ok(Opcode::Halt),
-			x => Err(Error::IllegalOp(x)),
+			x => Err(Error::IllegalOp(x, None)),
 		}
 	}
 }
@@ -104,7 +114,8 @@ impl Machine {
 		let mut output = Vec::new();
 		let mut input_iter = input.into_iter();
 		loop {
-			let op = Opcode::try_from(self.read_ip_and_advance())?;
+			let op =
+				Opcode::try_from(self.read_ip_and_advance()).map_err(|e| e.add_loc(self.ip - 1))?;
 			match op {
 				Opcode::Add(p1, p2, p3) => self.bin_op(|a, b| a + b, p1, p2, p3)?,
 				Opcode::Mul(p1, p2, p3) => self.bin_op(|a, b| a * b, p1, p2, p3)?,
