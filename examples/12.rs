@@ -73,17 +73,16 @@ impl Moon {
 	
 }
 
-fn lcm(x:u64,y:u64) -> u64{ //Not a good algorithm but fast enough
-	let mut mx=x;
-	let mut my=y;
-	while mx!=my{
-		if mx<my{
-			mx+=x;
-		}else{
-			my+=y;
-		}
+fn gcd(a:u64,b:u64)->u64{
+	if b==0{
+		a
+	}else{
+		gcd(b,a%b)
 	}
-	mx
+}
+
+fn lcm(x:u64,y:u64) -> u64{
+	x/gcd(x,y)*y
 }
 fn main() -> std::io::Result<()>{
 	let input=BufReader::new(get_input(12)?);
