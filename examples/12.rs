@@ -111,19 +111,16 @@ fn main() -> std::io::Result<()>{
 		let z_state=|m:&Moon| (m.pos.z,m.vel.z);
 		if x_period.is_none(){
 			if moons.iter().map(x_state).eq(moons0.iter().map(x_state)){
-				println!("x: {}",i);
 				x_period=Some(i);
 			}
 		};
 		if y_period.is_none(){
 			if moons.iter().map(y_state).eq(moons0.iter().map(y_state)){
-				println!("y: {}",i);
 				y_period=Some(i);
 			}
 		};
 		if z_period.is_none(){
 			if moons.iter().map(z_state).eq(moons0.iter().map(z_state)){
-				println!("z: {}",i);
 				z_period=Some(i);
 			}
 		};
