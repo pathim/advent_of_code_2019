@@ -4,19 +4,6 @@ use std::{
 	io::Read,
 };
 
-fn show_area(a: u32) -> String {
-	let mut t = a;
-	let mut res = String::with_capacity(30);
-	for i in 1..=25 {
-		res.push(if t & 1 == 1 { '#' } else { '.' });
-		t /= 2;
-		if i % 5 == 0 {
-			res.push('\n');
-		}
-	}
-	res
-}
-
 fn generate_bitmask(bit: u8) -> u32 {
 	let mut res = 0;
 	let deltas = [-5, -1, 1, 5];
