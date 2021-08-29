@@ -5,7 +5,7 @@ fn neighbours(x: i64, y: i64) -> [(i64, i64); 5] {
 	[(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1), (x, y)]
 }
 
-fn main() -> std::io::Result<()> {
+fn main() -> Result<(),ureq::Error> {
 	let day = 17;
 	let input = get_input(day)?;
 	let mut m = Machine::from_file(input);
@@ -28,8 +28,7 @@ fn main() -> std::io::Result<()> {
 						Some((*a as usize, *b as usize))
 					}
 				})
-				.filter_map(|(a, b)| lines.get(b).map(|x| (a, x)))
-				.filter_map(|(a, l)| l.get(a))
+				.filter_map(|(a, b)| lines.get(b).and_then(|x| x.get(a)))
 				.map(|x| (*x == 35) as i32)
 				.sum();
 			if nb_count == 5 {

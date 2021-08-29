@@ -1,7 +1,7 @@
 use aoc2019::get_input;
 use aoc2019::intcode::{Int, Machine};
 
-fn main() -> std::io::Result<()> {
+fn main() -> Result<(),ureq::Error> {
 	let day = 21;
 	let input = get_input(day)?;
 	let mut m = Machine::from_file(input);

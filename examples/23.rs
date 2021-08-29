@@ -15,7 +15,7 @@ fn distribute_packets(packets: Vec<Int>, buffers: &mut Vec<Vec<Int>>) -> Option<
 	nat
 }
 
-fn main() -> std::io::Result<()> {
+fn main() -> Result<(),ureq::Error> {
 	let day = 23;
 	let input = get_input(day)?;
 	let bm = Machine::from_file(input);

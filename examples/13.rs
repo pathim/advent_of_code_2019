@@ -1,6 +1,6 @@
 use aoc2019::get_input;
 use aoc2019::intcode::Machine;
-fn main() -> std::io::Result<()> {
+fn main() -> Result<(),ureq::Error> {
 	let day = 13;
 	println!("Day {}", day);
 	let base_machine = Machine::from_file(get_input(day)?);

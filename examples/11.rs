@@ -100,7 +100,7 @@ impl std::fmt::Display for PaintRobot {
 	}
 }
 
-fn main() -> std::io::Result<()> {
+fn main() -> Result<(),ureq::Error> {
 	let day = 11;
 	println!("Day {}", day);
 	let base_machine = Machine::from_file(get_input(day)?);

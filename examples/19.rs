@@ -27,7 +27,7 @@ fn find_edge(m: &Machine, y: Int, xstart: Int, xend: Int) -> (Int, Int) {
 	(x0, x1)
 }
 
-fn main() -> std::io::Result<()> {
+fn main() -> Result<(),ureq::Error> {
 	let day = 19;
 	let input = get_input(day)?;
 	let bm = Machine::from_file(input);
