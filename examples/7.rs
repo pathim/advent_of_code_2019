@@ -27,7 +27,7 @@ fn find_output(phases: Vec<Int>, base_m: Machine) -> Int {
 		}
 	}
 }
-fn main() -> std::io::Result<()> {
+fn main() -> Result<(),ureq::Error> {
 	let day = 7;
 	println!("Day {}", day);
 	let base_machine = Machine::from_file(get_input(day)?);
